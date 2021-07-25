@@ -4,18 +4,16 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from coupon import random_char
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
-SAMPLE_RANGE_NAME = '9486-/到2021底!A:G'
+SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
+RANGE_NAME = '9486-/到2021底!A:G'
 
-def get_data_from_gsheets():
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet.
-    """
+def gs_auth():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -33,13 +31,14 @@ def get_data_from_gsheets():
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
-
     service = build('sheets', 'v4', credentials=creds)
+    return service.spreadsheets()
 
+
+def get_data_from_gsheets(gs_sheets):
     # Call the Sheets API
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                range=SAMPLE_RANGE_NAME).execute()
+    result = gs_sheets.values().get(spreadsheetId=SPREADSHEET_ID,
+                                range=RANGE_NAME).execute()
     values = result.get('values', [])
 
     if not values:
@@ -54,9 +53,21 @@ def find_row_by_serial_number(rows, target):
             return row
     return None
 
+def find_last_serial_number(rows):
+    last_row = rows[len(rows)-1]
+    return last_row[0]
+
+def append_data_into_gsheets(gs_sheets, rows):
+    new_sn = int(find_last_serial_number(rows))+1
+    value_range_body = {"values": [[new_sn, '-', random_char(3), '', '測試員', '2022/12/31', '可抵用主商品100元租金']]}
+    request = gs_sheets.values().append(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME, valueInputOption='USER_ENTERED', body=value_range_body)
+    response = request.execute()
+
+
 def main():
-    rows = get_data_from_gsheets()
-    print(find_row_by_serial_number(rows, '9496'))
+    gs_sheets = gs_auth()
+    rows = get_data_from_gsheets(gs_sheets)
+    append_data_into_gsheets(gs_sheets, rows)
 
 
 if __name__ == '__main__':
