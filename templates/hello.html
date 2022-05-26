@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>The first Template</title>
+</head>
+<body>
+    <h1> Coupon Site </h1>
+    <h2> Find </h2>
+    <form method="post" action="{{ url_for('find_coupon') }}">
+        <p>Find: <input type='text' name='find_text' /> <button type='submit'> Find </button>
+    </form>
+</body>
+</html>
