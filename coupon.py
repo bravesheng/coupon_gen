@@ -1,6 +1,3 @@
-start_sn = 0
-end_sn = 0
-random_len = 0
 random_code_list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 col_id = {"折扣碼":0, "兌換日期":1, "客戶代號":2, "使用期限":3, "備註":4}
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
