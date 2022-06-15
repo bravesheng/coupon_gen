@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Search Result{% endblock %}
+
+{% block main %}
+  <!--
 <h1>Record Data</h1>
 <p>Coupon Code: {{result.coupon_code}}</p>
 <p>Owner: {{result.owner}}</p>
@@ -5,3 +10,34 @@
 <p>Expiry Date: {{result.expiry_date}}</p>
 <p>Notes: {{result.notes}}</p>
 <p>Status: {{result.status}}</p>
+-->
+<form class="form-inline" method="post" action="{{ url_for('find_coupon') }}">
+  <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.coupon_code}}" readonly>
+    <label for="floatingInput">Coupon Code</label>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="floatingInput" value="{{result.owner}}" readonly>
+    <label for="floatingInput">Owner</label>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="date" class="form-control" id="floatingInput" value="{{result.date_of_use}}" readonly>
+    <label for="floatingInput">Date of Use</label>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="date" class="form-control" id="floatingInput" value="{{result.expiry_date}}" readonly>
+    <label for="floatingInput">Expiry Datee</label>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="floatingInput" value="{{result.notes}}">
+    <label for="floatingInput">Notes</label>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="floatingInput" value="{{result.status}}" readonly>
+    <label for="floatingInput">Status</label>
+  </div>
+  <input type="submit" class="btn btn-primary" name="action" value="Update"/>
+  <input type="submit" class="btn btn-primary" name="action" value="Use Coupon"/>
+  <input type="reset" class="btn btn-primary" name="action" value="Reset"/>
+</form>
+{% endblock %}

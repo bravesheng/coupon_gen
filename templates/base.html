@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- 提供 ico 檔案 -->
+  <link rel="icon" href="{{ url_for('static', filename='img/alpaca_logo.ico') }}">
+
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+  <!-- 引入我們自己的 CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+
+  <!-- 直接定義 CSS -->
+  <style> body {font-family: 'Noto Sans TC', sans-serif;}</style>
+
+  <!-- 可供更改的部分 -->
+  <title>{% block title %}{% endblock %}</title>
+
+</head>
+
+<body>
+    <!-- 希望能固定出現在每個網頁的 nav -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="{{ url_for('hello') }}">Coupon Manager</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Search <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Generate New</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  
+  <main>
+    <!-- 可供更改的部分 -->
+    {% block main %}{% endblock %}
+  </main>
+  
+  <!-- 希望能固定出現在每個網頁的 footer -->
+  <footer>
+  <p style="text-align: center;"> © 2022 數位小搖滾有限公司</p>
+  </footer>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <!-- 可供更改的部分 -->
+    {% block script %}{% endblock %}
+  </body>

@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>The first Template</title>
-</head>
-<body>
-    <h1> Coupon Site </h1>
-    <h2> Find </h2>
-    <form method="post" action="{{ url_for('find_coupon') }}">
-        <p>Find: <input type='text' name='find_text' /> <button type='submit'> Find </button>
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Coupon Manager{% endblock %}
+
+{% block main %}
+<div class="jumbotron">
+  <p> Find By Coupon Code </p>
+  <form class="form-inline" method="post" action="{{ url_for('find_coupon') }}">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" type='text' name='find_text'>
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+  </form>
+</div>
+{% endblock %}

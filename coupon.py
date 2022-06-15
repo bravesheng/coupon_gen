@@ -2,6 +2,11 @@ start_sn = 0
 end_sn = 0
 random_len = 0
 random_code_list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+col_id = {"折扣碼":0, "兌換日期":1, "客戶代號":2, "使用期限":3, "備註":4}
+SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
+RANGE_NAME = 'DEBUG!A:E'
+from gsheet import GoogleSheetTools
+from datetime import timedelta, date
 
 def random_char(code_length):
     import random
@@ -11,52 +16,65 @@ def random_char(code_length):
     return result_str
 
 class Coupon():
-    coupon_code = None
-    date_of_use = None
-    owner = None
-    expiry_date = None
-    notes = None
-    def __init__(self, coupon_code, date_of_use, owner, expiry_date, notes):
+    def __init__(self, row_idx, coupon_code, date_of_use, owner, expiry_date, notes):
+        self.row_idx = row_idx #record the order related to google sheets
         self.coupon_code = coupon_code
         self.date_of_use = date_of_use
         self.owner = owner
         self.expiry_date = expiry_date
         self.notes = notes
+        if len(self.date_of_use) <= 0:
+            self.status = '未使用'
+        else:
+            self.status = '已使用'
+
     def use_this_coupon(self):
         import datetime
         date_of_use = datetime.date.today()
-    def status(self):
-        if self.date_of_use == None:
-            return "尚未使用"
-        return "已使用"
-
-from gsheet import GoogleSheetTools
 
 class CouponTable():
     def __init__(self):
-        self.col_id = {"流水編號":0, "符號":1, "驗證碼":2, "兌換日期":3, "客戶代號":4, "使用期限":5, "抵用額度":6}
-        self.mysheet = GoogleSheetTools()
+        self.mysheet = GoogleSheetTools(SPREADSHEET_ID, RANGE_NAME)
         self.rows = self.mysheet.get_data()
 
-    def __find_last_serial_number(self):
+    def __find_last_coupon_code(self):
         last_row = self.rows[len(self.rows)-1]
         return last_row[0]
 
-    def find_coupon_by_code(self, code):
+    def find_coupon_by_sn(self, sn):
         if self.rows:
-            for x in self.rows:
-                if x[self.col_id["流水編號"]] == code:
-                    result = Coupon(x[self.col_id["流水編號"]]+x[self.col_id["符號"]]+x[self.col_id["驗證碼"]],x[self.col_id["兌換日期"]],x[self.col_id["客戶代號"]],x[self.col_id["使用期限"]],x[self.col_id["抵用額度"]])
+            for x in range(1, len(self.rows)):
+                y = self.rows[x]
+                if y[self.col_id["流水編號"]] == sn:
+                    result = Coupon(x, y[self.col_id["流水編號"]]+y[self.col_id["驗證碼"]],y[self.col_id["兌換日期"]],y[self.col_id["客戶代號"]],y[self.col_id["使用期限"]],y[self.col_id["備註"]])
                     return result
         return None
+
+    def update_coupon(self, coupon:Coupon):
+        print(coupon.coupon_code)
+        value_range_body = {"values": [[coupon.coupon_code, '', '', coupon.date_of_use, coupon.owner, coupon.expiry_date, coupon.notes]]}
+        self.mysheet.update_data('R['+str(coupon.row_idx)+']', value_range_body)
+
+    def generate_new_coupon(self):
+        last_code = self.__find_last_coupon_code()
+        last_number = last_code[0:4]
+        new_sn = int(last_number)+1
+        new_code = str(new_sn) + random_char(3)
+        new_coupon = Coupon(0, new_code, '', '', date.today() + timedelta(days=365),'')
+        return new_coupon
+
     def append(self):
-        new_sn = int(self.__find_last_serial_number())+1
-        value_range_body = {"values": [[new_sn, '-', random_char(3), '', '新資料', '2023/12/31', '可抵用主商品100元租金']]}
+        last_code = self.__find_last_coupon_code()
+        last_number = last_code[0:4]
+        new_sn = int(last_number)+1
+        new_code = str(new_sn) + random_char(3)
+        value_range_body = {"values": [[new_code, '','', '2023-12-31', '可抵用主商品100元租金']]}
         self.mysheet.append(value_range_body)
  
 def main():
     table = CouponTable()
-    print(table.find_coupon_by_code("9747"))
+    table.append()
+
 
 if __name__ == '__main__':
     main()
