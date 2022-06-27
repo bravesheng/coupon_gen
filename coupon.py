@@ -5,7 +5,8 @@ CP_OWNER = 2
 CP_EXPIRY_DATE = 3
 CP_NOTES = 4
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
-RANGE_NAME = 'DEBUG!A:E'
+PAGE_NAME = 'DEBUG'
+RANGE_NAME = 'A:E'
 from gsheet import GoogleSheetTools
 from datetime import timedelta, date
 
@@ -47,7 +48,7 @@ class Coupon():
 
 class CouponTable():
     def __init__(self):
-        self.mysheet = GoogleSheetTools(SPREADSHEET_ID, RANGE_NAME)
+        self.mysheet = GoogleSheetTools(SPREADSHEET_ID, PAGE_NAME + '!' + RANGE_NAME)
         self.rows = self.mysheet.get_data()
 
     def __find_last_coupon_code(self):
@@ -64,8 +65,8 @@ class CouponTable():
         return None
 
     def update_coupon(self, coupon:Coupon):
-        value_range_body = {"values": [[coupon.coupon_code, '', '', coupon.date_of_use, coupon.owner, coupon.expiry_date, coupon.notes]]}
-        self.mysheet.update_data('R['+str(coupon.row_idx)+']', value_range_body)
+        value_range_body = {"values": [[coupon.coupon_code, coupon.strft_date_of_use(), coupon.owner, coupon.strft_expiry_date(), coupon.notes]]}
+        self.mysheet.update_data(PAGE_NAME + '!' + 'R['+str(coupon.row_idx)+']', value_range_body)
 
     def generate_new_coupon(self):
         last_code = self.__find_last_coupon_code()
@@ -81,9 +82,11 @@ class CouponTable():
  
 def main():
     table = CouponTable()
-    old_coupon = table.find_coupon_by_sn("9746MOP")
-    new_coupon = table.generate_new_coupon()
-    table.append_coupon(old_coupon)
+    old_coupon = table.find_coupon_by_sn("9748LOZ")
+    old_coupon.notes = '測試'
+    table.update_coupon(old_coupon)
+    # new_coupon = table.generate_new_coupon()
+    #table.append_coupon(new_coupon)
 
 
 if __name__ == '__main__':
