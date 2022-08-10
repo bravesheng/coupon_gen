@@ -5,7 +5,7 @@ CP_OWNER = 2
 CP_EXPIRY_DATE = 3
 CP_NOTES = 4
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
-PAGE_NAME = 'DEBUG'
+PAGE_NAME = '2023'
 RANGE_NAME = 'A:E'
 from gsheet import GoogleSheetTools
 from datetime import timedelta, date
@@ -82,11 +82,11 @@ class CouponTable():
  
 def main():
     table = CouponTable()
-    old_coupon = table.find_coupon_by_sn("9748LOZ")
-    old_coupon.notes = '測試'
-    table.update_coupon(old_coupon)
-    # new_coupon = table.generate_new_coupon()
-    #table.append_coupon(new_coupon)
+    #old_coupon = table.find_coupon_by_sn("9748LOZ")
+    #old_coupon.notes = '測試'
+    #table.update_coupon(old_coupon)
+    new_coupon = table.generate_new_coupon()
+    table.append_coupon(new_coupon)
 
 
 if __name__ == '__main__':

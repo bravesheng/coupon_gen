@@ -28,13 +28,12 @@ class GoogleSheetTools():
                 creds = Credentials.from_authorized_user_file(TOKEN_NAME, SCOPES)
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                # os.remove(TOKEN_NAME)
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-                creds = flow.run_local_server(port=0)
+                os.remove(TOKEN_NAME)
+                #creds.refresh(Request())
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open('token.json', 'w') as token:
+            with open(TOKEN_NAME, 'w') as token:
                 token.write(creds.to_json())
         service = build('sheets', 'v4', credentials=creds)
         self.sheet = service.spreadsheets()
