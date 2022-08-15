@@ -11,7 +11,7 @@
 <p>Notes: {{result.notes}}</p>
 <p>Status: {{result.status}}</p>
 -->
-<form class="form-inline" method="post" action="{{ url_for('find_coupon') }}">
+<form class="form-inline" method="post" action="{{ url_for('coupon_action') }}">
   <div class="form-floating mb-3">
     <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.coupon_code}}" readonly>
     <label for="floatingInput">Coupon Code</label>

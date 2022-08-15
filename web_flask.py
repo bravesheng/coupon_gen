@@ -20,12 +20,16 @@ def find_coupon():
         return 'no data match.'
     return render_template('find_coupon.html', **locals())
 
-@app.route('/use_coupon', methods=['POST'])
-def use_coupon():
-    global g_coupon_table
-    couopn_code = request.values['coupon_code']
-    target_coupon = g_coupon_table.find_coupon_by_sn(couopn_code[:4])
-    target_coupon.use_this_coupon()
+@app.route('/coupon_action', methods=['POST'])
+def coupon_action():
+    action = request.values['action']
+    if action == 'Use Coupon':
+        global g_coupon_table
+        couopn_code = request.values['coupon_code']
+        result = g_coupon_table.find_coupon_by_sn(couopn_code)
+        result.use_this_coupon()
+        g_coupon_table.update_coupon(result)
+        return render_template('find_coupon.html', **locals())
 
 if __name__ == '__main__':
     app.debug = True
