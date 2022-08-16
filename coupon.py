@@ -18,6 +18,10 @@ def random_char(code_length):
     return result_str
 
 class Coupon():
+    def __init__(self, row_idx, row_data):
+        self.row_idx = row_idx #record the order related to google sheets
+        self.row_data = row_data
+
     def __init__(self, row_idx, coupon_code, date_of_use, owner, expiry_date, notes):
         self.row_idx = row_idx #record the order related to google sheets
         self.coupon_code = coupon_code
@@ -33,6 +37,16 @@ class Coupon():
         elif type(date_of_use) is str and expiry_date != '':
             self.expiry_date = date.fromisoformat(expiry_date)
         self.notes = notes
+
+    def get_coupon_code(self):
+        return self.row_data[CP_COUPON_CODE]
+
+    def set_coupon_code(self, code):
+        self.row_data[CP_COUPON_CODE] = code
+
+    def get_date_of_use(self):
+        if len(self.row_data[CP_DATE_OF_USE]) > 0:
+            return date.fromisoformat(self.row_data[CP_DATE_OF_USE])
     
     def strft_date_of_use(self):
         if self.date_of_use:
@@ -65,7 +79,13 @@ class CouponTable():
         return None
 
     def update_coupon(self, coupon:Coupon):
-        value_range_body = {"values": [[coupon.coupon_code, coupon.strft_date_of_use(), coupon.owner, coupon.strft_expiry_date(), coupon.notes]]}
+        self.rows[coupon.row_idx][CP_COUPON_CODE] = coupon.coupon_code
+        self.rows[coupon.row_idx][CP_DATE_OF_USE] = coupon.strft_date_of_use()
+        self.rows[coupon.row_idx][CP_OWNER] = coupon.owner
+        self.rows[coupon.row_idx][CP_EXPIRY_DATE] = coupon.strft_expiry_date()
+        self.rows[coupon.row_idx][CP_NOTES] = coupon.notes
+        newone = self.rows[coupon.row_idx]
+        value_range_body = {"values": [[newone[CP_COUPON_CODE], newone[CP_DATE_OF_USE], newone[CP_OWNER], newone[CP_EXPIRY_DATE], newone[CP_NOTES]]]}
         self.mysheet.update_data(PAGE_NAME + '!' + 'R['+str(coupon.row_idx)+']', value_range_body)
 
     def generate_new_coupon(self):
