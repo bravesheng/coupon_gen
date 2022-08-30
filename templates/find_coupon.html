@@ -13,28 +13,24 @@
 -->
 <form class="form-inline" method="post" action="{{ url_for('coupon_action') }}">
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.coupon_code}}" readonly>
+    <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.get_coupon_code()}}" readonly>
     <label for="floatingInput">Coupon Code</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" value="{{result.owner}}" readonly>
+    <input type="text" class="form-control" id="floatingInput" value="{{result.get_owner()}}" readonly>
     <label for="floatingInput">Owner</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="date" class="form-control" id="floatingInput" value="{{result.date_of_use}}" readonly>
+    <input type="date" class="form-control" id="floatingInput" value="{{result.get_date_of_use()}}" readonly>
     <label for="floatingInput">Date of Use</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="date" class="form-control" id="floatingInput" value="{{result.expiry_date}}" readonly>
+    <input type="date" class="form-control" id="floatingInput" value="{{result.get_expiry_date()}}" readonly>
     <label for="floatingInput">Expiry Datee</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" value="{{result.notes}}">
+    <input type="text" class="form-control" id="floatingInput" value="{{result.get_notes()}}">
     <label for="floatingInput">Notes</label>
-  </div>
-  <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" value="{{result.status}}" readonly>
-    <label for="floatingInput">Status</label>
   </div>
   <input type="submit" class="btn btn-primary" name="action" value="Update"/>
   <input type="submit" class="btn btn-primary" name="action" value="Use Coupon"/>

@@ -21,6 +21,9 @@ class Coupon():
     def __init__(self, row_idx, row_data):
         self.row_idx = row_idx #record the order related to google sheets
         self.row_data = row_data
+        if len(row_data) <= CP_NOTES:
+            for i in range(len(row_data), CP_NOTES+1):
+                row_data.append('')
 
     def get_coupon_code(self):
         return self.row_data[CP_COUPON_CODE]
@@ -99,10 +102,11 @@ class CouponTable():
  
 def main():
     table = CouponTable()
-    old_coupon = table.find_coupon_by_sn("9748LOZ")
-    old_coupon.set_notes('test notes')
-    old_coupon.use_this_coupon()
-    table.update_coupon(old_coupon)
+    old_coupon = table.find_coupon_by_sn("9754JXS")
+    print(old_coupon.get_owner())
+    #old_coupon.set_notes('test notes')
+    #old_coupon.use_this_coupon()
+    #table.update_coupon(old_coupon)
    # table.generate_new_coupon()
 
 
