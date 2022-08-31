@@ -2,15 +2,6 @@
 {% block title %}Search Result{% endblock %}
 
 {% block main %}
-  <!--
-<h1>Record Data</h1>
-<p>Coupon Code: {{result.coupon_code}}</p>
-<p>Owner: {{result.owner}}</p>
-<p>Date of Use: {{result.date_of_use}}</p>
-<p>Expiry Date: {{result.expiry_date}}</p>
-<p>Notes: {{result.notes}}</p>
-<p>Status: {{result.status}}</p>
--->
 <form class="form-inline" method="post" action="{{ url_for('coupon_action') }}">
   <div class="form-floating mb-3">
     <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.get_coupon_code()}}" readonly>

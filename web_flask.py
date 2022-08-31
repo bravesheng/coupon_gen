@@ -17,7 +17,7 @@ def find_coupon():
     find_text = request.values['find_text']
     result = g_coupon_table.find_coupon_by_sn(find_text)
     if result == None:
-        return 'no data match.'
+        return render_template('hello.html', **locals())
     return render_template('find_coupon.html', **locals())
 
 @app.route('/coupon_action', methods=['POST'])

@@ -21,7 +21,7 @@ class Coupon():
     def __init__(self, row_idx, row_data):
         self.row_idx = row_idx #record the order related to google sheets
         self.row_data = row_data
-        if len(row_data) <= CP_NOTES:
+        if len(row_data) <= CP_NOTES:   #append column if column shoter
             for i in range(len(row_data), CP_NOTES+1):
                 row_data.append('')
 
