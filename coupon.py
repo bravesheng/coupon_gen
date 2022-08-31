@@ -93,7 +93,7 @@ class CouponTable():
         new_code = str(new_sn) + random_char(3)
         expiry_date = date.today() + timedelta(days=365)
         expiry_date.strftime("%Y-%m-%d")
-        self.rows.append([new_code, '', '', expiry_date.strftime("%Y-%m-%d"), ''])
+        self.rows.append([new_code, '', '', expiry_date.strftime("%Y-%m-%d"), '可抵用主商品100元租金'])
         new_row = self.rows[-1]
         new_coupon = Coupon(len(self.rows)-1, new_row)
         value_range_body = {"values": [[new_row[CP_COUPON_CODE], new_row[CP_DATE_OF_USE], new_row[CP_OWNER], new_row[CP_EXPIRY_DATE], new_row[CP_NOTES]]]}
