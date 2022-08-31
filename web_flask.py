@@ -1,4 +1,5 @@
 # save this as app.py
+from this import d
 from flask import Flask, render_template, request
 from datetime import datetime
 import coupon
@@ -22,14 +23,25 @@ def find_coupon():
 
 @app.route('/coupon_action', methods=['POST'])
 def coupon_action():
+    result = g_coupon_table.find_coupon_by_sn(request.values['coupon_code'])
     action = request.values['action']
     if action == 'Use Coupon':
-        global g_coupon_table
-        couopn_code = request.values['coupon_code']
-        result = g_coupon_table.find_coupon_by_sn(couopn_code)
         result.use_this_coupon()
         g_coupon_table.update_coupon(result)
         return render_template('find_coupon.html', **locals())
+    elif action == 'Update':
+        result.set_owner(request.values['owner'])
+        result.set_date_of_use(request.values['date_of_use'])
+        result.set_expiry_date(request.values['expiry_date'])
+        result.set_notes(request.values['notes'])
+        g_coupon_table.update_coupon(result)
+        return render_template('find_coupon.html', **locals())
+
+@app.route('/generate_new')
+def generate_new():
+    result = g_coupon_table.generate_new_coupon()
+    return render_template('find_coupon.html', **locals())
+
 
 if __name__ == '__main__':
     app.debug = True

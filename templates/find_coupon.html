@@ -1,26 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Search Result{% endblock %}
+{% block title %}Coupon Detail{% endblock %}
 
 {% block main %}
 <form class="form-inline" method="post" action="{{ url_for('coupon_action') }}">
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.get_coupon_code()}}" readonly>
+    <input type="text" class="form-control" id="floatingInput" name="coupon_code" value="{{result.get_coupon_code()}}">
     <label for="floatingInput">Coupon Code</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" value="{{result.get_owner()}}" readonly>
+    <input type="text" class="form-control" id="floatingInput" name="owner" value="{{result.get_owner()}}">
     <label for="floatingInput">Owner</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="date" class="form-control" id="floatingInput" value="{{result.get_date_of_use()}}" readonly>
+    <input type="date" class="form-control" id="floatingInput" name="date_of_use" value="{{result.get_date_of_use()}}">
     <label for="floatingInput">Date of Use</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="date" class="form-control" id="floatingInput" value="{{result.get_expiry_date()}}" readonly>
+    <input type="date" class="form-control" id="floatingInput" name="expiry_date" value="{{result.get_expiry_date()}}">
     <label for="floatingInput">Expiry Datee</label>
   </div>
   <div class="form-floating mb-3">
-    <input type="text" class="form-control" id="floatingInput" value="{{result.get_notes()}}">
+    <input type="text" class="form-control" id="floatingInput" name="notes" value="{{result.get_notes()}}">
     <label for="floatingInput">Notes</label>
   </div>
   <input type="submit" class="btn btn-primary" name="action" value="Update"/>
