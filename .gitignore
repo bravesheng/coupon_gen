@@ -3,3 +3,5 @@ __pycache__
 *.json
 *.pyc
 credentials.json
+token.jsom
+.DS_Store
