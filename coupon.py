@@ -5,7 +5,7 @@ CP_OWNER = 2
 CP_EXPIRY_DATE = 3
 CP_NOTES = 4
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
-PAGE_NAME = 'DEBUG'
+PAGE_NAME = '2023'
 RANGE_NAME = 'A:E'
 from gsheet import GoogleSheetTools
 from datetime import timedelta, date
@@ -90,7 +90,7 @@ class CouponTable():
         last_code = self.rows[-1][0] #last coupon code in rows
         last_number = last_code[0:4]
         new_sn = int(last_number)+1
-        new_code = str(new_sn) + random_char(3)
+        new_code = str(new_sn).zfill(4) + random_char(3)
         expiry_date = date.today() + timedelta(days=365)
         expiry_date.strftime("%Y-%m-%d")
         self.rows.append([new_code, '', '', expiry_date.strftime("%Y-%m-%d"), '可抵用主商品100元租金'])
@@ -102,12 +102,12 @@ class CouponTable():
  
 def main():
     table = CouponTable()
-    old_coupon = table.find_coupon_by_sn("9754JXS")
-    print(old_coupon.get_owner())
+    #old_coupon = table.find_coupon_by_sn("9754JXS")
+    #print(old_coupon.get_owner())
     #old_coupon.set_notes('test notes')
     #old_coupon.use_this_coupon()
     #table.update_coupon(old_coupon)
-   # table.generate_new_coupon()
+    table.generate_new_coupon()
 
 
 if __name__ == '__main__':

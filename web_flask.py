@@ -5,16 +5,17 @@ from datetime import datetime
 import coupon
 
 app = Flask(__name__)
-g_coupon_table = coupon.CouponTable()
+g_coupon_table = None
 
 @app.route("/")
 def hello():
-    now = datetime.now()
     return render_template('hello.html', **locals())
 
 @app.route('/find_coupon', methods=['POST'])
 def find_coupon():
     global g_coupon_table
+    if(g_coupon_table == None):
+        g_coupon_table = coupon.CouponTable()
     find_text = request.values['find_text']
     result = g_coupon_table.find_coupon_by_sn(find_text)
     if result == None:
@@ -44,6 +45,5 @@ def generate_new():
 
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run()
-
+    #app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
