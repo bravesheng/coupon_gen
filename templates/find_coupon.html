@@ -23,6 +23,7 @@
     <input type="text" class="form-control" id="floatingInput" name="notes" value="{{result.get_notes()}}">
     <label for="floatingInput">Notes</label>
   </div>
+  {% block sms %}{% endblock %}
   <input type="submit" class="btn btn-primary" name="action" value="Update"/>
   <input type="submit" class="btn btn-primary" name="action" value="Use Coupon"/>
   <input type="reset" class="btn btn-primary" name="action" value="Reset"/>

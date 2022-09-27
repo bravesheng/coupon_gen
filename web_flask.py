@@ -40,10 +40,13 @@ def coupon_action():
 
 @app.route('/generate_new')
 def generate_new():
+    global g_coupon_table
+    if(g_coupon_table == None):
+        g_coupon_table = coupon.CouponTable()
     result = g_coupon_table.generate_new_coupon()
-    return render_template('find_coupon.html', **locals())
+    return render_template('generate_new.html', **locals())
 
 
 if __name__ == '__main__':
-    #app.run(debug=True)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
+    #app.run(debug=True, host='0.0.0.0', port=5000)

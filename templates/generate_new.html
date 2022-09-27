@@ -1,0 +1,18 @@
+{% extends "find_coupon.html" %}
+{% block sms %}
+<div class="form-floating mb-3">
+    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea1" style="height: 150px">
+提供您老客戶折扣碼可分享給計畫租借的朋友或下次使用
+折價券兌換碼：{{result.get_coupon_code()}}
+使用期限{{result.get_expiry_date()}}，一筆訂單可使用一組，滿額最高可抵用100元租金
+詳細辦法請參考 https://zuzoo.page.link/coupon
+    </textarea>
+    <label for="floatingTextarea1">折扣碼訊息</label>
+</div>
+<div class="form-floating mb-3">
+    <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px">        
+如覺得服務不錯，歡迎在Google給好評價，謝謝您：https://g.page/zuzoo/review?gm
+    </textarea>
+    <label for="floatingTextarea2">評價提醒</label>
+</div>
+{% endblock %}
