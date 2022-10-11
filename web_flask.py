@@ -16,7 +16,6 @@ CLIENT_SECRETS_FILE = "client_secret.json"
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
-TOKEN_NAME = 'token.json'
 
 app = Flask(__name__)
 # Note: A secret key is included in the sample so that it works.
@@ -27,17 +26,11 @@ g_coupon_table = None
 
 @app.route("/")
 def hello():
-    return render_template('hello.html', **locals())
-
-
-@app.route('/test')
-def test_api_request():
-    # Load credentials
-    credentials = None
-    if os.path.exists(TOKEN_NAME):
-        credentials = Credentials.from_authorized_user_file(TOKEN_NAME, SCOPES)
-    else:
+    if 'credentials' not in flask.session:
         return flask.redirect('authorize')
+        
+    # Load credentials
+    credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
 
     #sonething we can do when ceredentials successed.
     global g_coupon_table
@@ -45,8 +38,7 @@ def test_api_request():
         g_coupon_table = coupon.CouponTable(credentials)
 
     # Save credentials back to session in case access token was refreshed.
-    with open(TOKEN_NAME, 'w') as token:
-        token.write(credentials.to_json())
+    flask.session['credentials'] = credentials_to_dict(credentials)
 
     leave_msg = 'Credentials Success.'
     return render_template('hello.html', **locals())
@@ -81,16 +73,19 @@ def oauth2callback():
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.
     state = flask.session['state']
+
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = flask.request.url
     flow.fetch_token(authorization_response=authorization_response)
+
+    # Store credentials in the session.
     credentials = flow.credentials
-    # Save the credentials for the next run
-    with open(TOKEN_NAME, 'w') as token:
-        token.write(credentials.to_json())
-    return flask.redirect(flask.url_for('test_api_request'))
+    flask.session['credentials'] = credentials_to_dict(credentials)
+
+    return flask.redirect(flask.url_for('hello'))
 
 
 @app.route('/revoke')
@@ -111,9 +106,40 @@ def revoke():
 
 @app.route('/clear')
 def clear_credentials():
-    if os.path.exists(TOKEN_NAME):
-        os.remove(TOKEN_NAME)
+    if 'credentials' in flask.session:
+        del flask.session['credentials']
     return ('Credentials have been cleared.<br><br>' + print_index_table())
+
+
+def credentials_to_dict(credentials):
+    return {'token': credentials.token,
+            'refresh_token': credentials.refresh_token,
+            'token_uri': credentials.token_uri,
+            'client_id': credentials.client_id,
+            'client_secret': credentials.client_secret,
+            'scopes': credentials.scopes}
+
+
+def print_index_table():
+    return ('<table>' +
+          '<tr><td><a href="/test">Test an API request</a></td>' +
+          '<td>Submit an API request and see a formatted JSON response. ' +
+          '    Go through the authorization flow if there are no stored ' +
+          '    credentials for the user.</td></tr>' +
+          '<tr><td><a href="/authorize">Test the auth flow directly</a></td>' +
+          '<td>Go directly to the authorization flow. If there are stored ' +
+          '    credentials, you still might not be prompted to reauthorize ' +
+          '    the application.</td></tr>' +
+          '<tr><td><a href="/revoke">Revoke current credentials</a></td>' +
+          '<td>Revoke the access token associated with the current user ' +
+          '    session. After revoking credentials, if you go to the test ' +
+          '    page, you should see an <code>invalid_grant</code> error.' +
+          '</td></tr>' +
+          '<tr><td><a href="/clear">Clear credentials</a></td>' +
+          '<td>Clear the access token currently stored in server. ' +
+          '    After clearing the token, if you <a href="/test">test the ' +
+          '    API request</a> again, you should go back to the auth flow.' +
+          '</td></tr></table>')
 
 
 @app.route('/find_coupon', methods=['POST'])
@@ -150,27 +176,6 @@ def generate_new():
         g_coupon_table = coupon.CouponTable()
     result = g_coupon_table.generate_new_coupon()
     return render_template('generate_new.html', **locals())
-
-def print_index_table():
-    return ('<table>' +
-          '<tr><td><a href="/test">Test an API request</a></td>' +
-          '<td>Submit an API request and see a formatted JSON response. ' +
-          '    Go through the authorization flow if there are no stored ' +
-          '    credentials for the user.</td></tr>' +
-          '<tr><td><a href="/authorize">Test the auth flow directly</a></td>' +
-          '<td>Go directly to the authorization flow. If there are stored ' +
-          '    credentials, you still might not be prompted to reauthorize ' +
-          '    the application.</td></tr>' +
-          '<tr><td><a href="/revoke">Revoke current credentials</a></td>' +
-          '<td>Revoke the access token associated with the current user ' +
-          '    session. After revoking credentials, if you go to the test ' +
-          '    page, you should see an <code>invalid_grant</code> error.' +
-          '</td></tr>' +
-          '<tr><td><a href="/clear">Clear credentials</a></td>' +
-          '<td>Clear the access token currently stored in server. ' +
-          '    After clearing the token, if you <a href="/test">test the ' +
-          '    API request</a> again, you should go back to the auth flow.' +
-          '</td></tr></table>')
 
 if __name__ == '__main__':
   # When running locally, disable OAuthlib's HTTPs verification.
