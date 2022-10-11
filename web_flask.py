@@ -53,7 +53,7 @@ def authorize():
     # # for the OAuth 2.0 client, which you configured in the API Console. If this
     # # value doesn't match an authorized URI, you will get a 'redirect_uri_mismatch'
     # # error.
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True, _scheme='https')
 
     authorization_url, state = flow.authorization_url(
     # Enable offline access so that you can refresh an access token without
@@ -75,10 +75,10 @@ def oauth2callback():
     state = flask.session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = flask.url_for('oauth2callback', _external=True, _scheme='https')
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    authorization_response = flask.request.url
+    authorization_response = flask.request.url.replace('http','https')
     flow.fetch_token(authorization_response=authorization_response)
 
     # Store credentials in the session.
@@ -181,6 +181,6 @@ if __name__ == '__main__':
   # When running locally, disable OAuthlib's HTTPs verification.
   # ACTION ITEM for developers:
   #     When running in production *do not* leave this option enabled.
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-    app.run(debug=True, port=8080)
-    #app.run(debug=True, host='0.0.0.0', port=8080)
+    #os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    #app.run(debug=True, port=8080)
+    app.run(debug=True, host='0.0.0.0', port=8080)
