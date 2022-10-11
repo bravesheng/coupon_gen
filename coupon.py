@@ -5,7 +5,7 @@ CP_OWNER = 2
 CP_EXPIRY_DATE = 3
 CP_NOTES = 4
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
-PAGE_NAME = '2023'
+PAGE_NAME = 'DEBUG'
 RANGE_NAME = 'A:E'
 from gsheet import GoogleSheetTools
 from datetime import timedelta, date
@@ -68,8 +68,8 @@ class Coupon():
         self.row_data[CP_NOTES] = notes
 
 class CouponTable():
-    def __init__(self):
-        self.mysheet = GoogleSheetTools(SPREADSHEET_ID, PAGE_NAME + '!' + RANGE_NAME)
+    def __init__(self, creds):
+        self.mysheet = GoogleSheetTools(SPREADSHEET_ID, PAGE_NAME + '!' + RANGE_NAME, creds)
         self.rows = self.mysheet.get_data()
 
     def find_coupon_by_sn(self, sn):

@@ -13,38 +13,18 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of coupon spreadsheet.
 TOKEN_NAME = 'token.json'
+CLIENT_SECRETS_FILE = "client_secret.json"
 
 class GoogleSheetTools():
-    def __init__(self, spreadsheetId, range):
-        self.__auth()
-        self.__spreadsheetId = spreadsheetId
-        self.__range = range
-
-    def __auth(self):
-        creds = None
-        # The file token.json stores the user's access and refresh tokens, and is
-        # # created automatically when the authorization flow completes for the first
-        # # time.
-        if os.path.exists(TOKEN_NAME):
-                creds = Credentials.from_authorized_user_file(TOKEN_NAME, SCOPES)
-        # If there are no (valid) credentials available, let the user log in.
-        if not creds or not creds.valid:
-            if creds and creds.expired and creds.refresh_token:
-                #os.remove(TOKEN_NAME)
-                creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-                #creds = flow.run_local_server(port=5050)
-                creds = flow.run_console()
-            # Save the credentials for the next run
-            with open(TOKEN_NAME, 'w') as token:
-                token.write(creds.to_json())
+    def __init__(self, spreadsheetId, range, creds):
         try:
             service = build('sheets', 'v4', credentials=creds)
         except HttpError as err:
             print(err)
-
+            
         self.sheet = service.spreadsheets()
+        self.__spreadsheetId = spreadsheetId
+        self.__range = range
 
     def get_data(self):
         result = self.sheet.values().get(spreadsheetId=self.__spreadsheetId, range=self.__range).execute()
