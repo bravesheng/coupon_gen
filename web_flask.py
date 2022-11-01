@@ -1,4 +1,5 @@
 # save this as app.py
+from http import HTTPStatus
 from flask import Flask, render_template, request
 
 import os
@@ -20,11 +21,14 @@ app = Flask(__name__)
 # Note: A secret key is included in the sample so that it works.
 # If you use this code in your application, replace this with a truly secret
 # key. See https://flask.palletsprojects.com/quickstart/#sessions.
-app.secret_key = 'secretkeyfordemo'
+app.secret_key = 'b802a26fcce058997a8f1e74e61c7a5c24d4bf4d29d92c06cbbe26cf2d760192'
 g_coupon_table = None
 
 @app.route("/")
 def hello():
+    if 'localhost' in flask.request.host_url:
+        FORCE_HTTPS = False
+
     if 'credentials' not in flask.session:
         return flask.redirect('authorize')
         
@@ -61,8 +65,9 @@ def authorize():
     # Enable offline access so that you can refresh an access token without
     # re-prompting the user for permission. Recommended for web server apps.
     access_type='offline',
+    approval_prompt='force',
     # Enable incremental authorization. Recommended as a best practice.
-    include_granted_scopes='false')
+    include_granted_scopes='true')
 
     # Store the state so the callback can verify the auth server response.
     flask.session['state'] = state
@@ -189,7 +194,7 @@ if __name__ == '__main__':
   # When running locally, disable OAuthlib's HTTPs verification.
   # ACTION ITEM for developers:
   #     When running in production *do not* leave this option enabled.
-    if not FORCE_HTTPS:
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
     #app.run(debug=True, port=8080)
     app.run(debug=True, host='0.0.0.0', port=8080)
