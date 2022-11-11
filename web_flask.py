@@ -1,6 +1,7 @@
 # save this as app.py
 from http import HTTPStatus
 from flask import Flask, render_template, request
+from google.auth.transport.requests import Request
 
 import os
 import flask
@@ -35,6 +36,8 @@ def hello():
     # Load credentials
     credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
 
+    if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
     #sonething we can do when ceredentials successed.
     global g_coupon_table
     if(g_coupon_table == None):
@@ -194,7 +197,8 @@ if __name__ == '__main__':
   # When running locally, disable OAuthlib's HTTPs verification.
   # ACTION ITEM for developers:
   #     When running in production *do not* leave this option enabled.
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    if not FORCE_HTTPS:
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
     #app.run(debug=True, port=8080)
     app.run(debug=True, host='0.0.0.0', port=8080)
