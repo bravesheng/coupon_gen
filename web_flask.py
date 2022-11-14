@@ -27,6 +27,7 @@ g_coupon_table = None
 
 @app.route("/")
 def hello():
+    global FORCE_HTTPS
     if 'localhost' in flask.request.host_url:
         FORCE_HTTPS = False
 
