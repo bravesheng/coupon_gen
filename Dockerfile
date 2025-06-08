@@ -6,6 +6,6 @@ ADD . /app
 
 RUN pip install -r requirements.txt
 
-CMD python web_flask.py
+CMD ["python", "web_flask.py"]
 
 EXPOSE 8080
