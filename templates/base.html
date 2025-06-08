@@ -25,23 +25,45 @@
     <!-- 希望能固定出現在每個網頁的 nav -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="{{ url_for('hello') }}">Coupon Manager</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
     
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/">Search</a>
+            <a class="nav-link" href="{{ url_for('hello') }}">Search</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="generate_new">Generate New</a>
+            <a class="nav-link" href="{{ url_for('generate_new') }}">Generate New</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Auth Actions
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownAuth">
+              <li><a class="dropdown-item" href="{{ url_for('authorize') }}">Test Auth Flow</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('revoke') }}">Revoke Credentials</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('clear_credentials') }}">Clear Credentials</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/test">Test API Request (Test Route)</a></li>
+            </ul>
           </li>
         </ul>
       </div>
     </nav>
   
-  <main>
+  <main class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <!-- 可供更改的部分 -->
     {% block main %}{% endblock %}
   </main>

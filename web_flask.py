@@ -107,7 +107,8 @@ def oauth2callback():
 @app.route('/revoke')
 def revoke():
     if 'credentials' not in flask.session:
-        return ('You need to <a href="/authorize">authorize</a> before testing the code to revoke credentials.')
+        flask.flash('You need to authorize before you can revoke credentials.', 'warning')
+        return flask.redirect(flask.url_for('hello'))
 
     credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
 
@@ -115,16 +116,22 @@ def revoke():
 
     status_code = getattr(revoke, 'status_code')
     if status_code == 200:
-        return('Credentials successfully revoked.' + print_index_table())
+        flask.flash('Credentials successfully revoked.', 'success')
+        if 'credentials' in flask.session:
+            del flask.session['credentials'] # Ensure re-auth or message about no creds
     else:
-        return('An error occurred.' + print_index_table())
+        flask.flash('An error occurred while revoking credentials.', 'danger')
+    return flask.redirect(flask.url_for('hello'))
 
 
 @app.route('/clear')
 def clear_credentials():
     if 'credentials' in flask.session:
         del flask.session['credentials']
-    return ('Credentials have been cleared.<br><br>' + print_index_table())
+        flask.flash('Credentials have been cleared.', 'success')
+    else:
+        flask.flash('No credentials found in session to clear.', 'info')
+    return flask.redirect(flask.url_for('hello'))
 
 
 def credentials_to_dict(credentials):
@@ -136,26 +143,7 @@ def credentials_to_dict(credentials):
             'scopes': credentials.scopes}
 
 
-def print_index_table():
-    return ('<table>' +
-          '<tr><td><a href="/test">Test an API request</a></td>' +
-          '<td>Submit an API request and see a formatted JSON response. ' +
-          '    Go through the authorization flow if there are no stored ' +
-          '    credentials for the user.</td></tr>' +
-          '<tr><td><a href="/authorize">Test the auth flow directly</a></td>' +
-          '<td>Go directly to the authorization flow. If there are stored ' +
-          '    credentials, you still might not be prompted to reauthorize ' +
-          '    the application.</td></tr>' +
-          '<tr><td><a href="/revoke">Revoke current credentials</a></td>' +
-          '<td>Revoke the access token associated with the current user ' +
-          '    session. After revoking credentials, if you go to the test ' +
-          '    page, you should see an <code>invalid_grant</code> error.' +
-          '</td></tr>' +
-          '<tr><td><a href="/clear">Clear credentials</a></td>' +
-          '<td>Clear the access token currently stored in server. ' +
-          '    After clearing the token, if you <a href="/test">test the ' +
-          '    API request</a> again, you should go back to the auth flow.' +
-          '</td></tr></table>')
+# print_index_table() function removed as its functionality is now in base.html
 
 
 @app.route('/find_coupon', methods=['POST'])
@@ -187,9 +175,28 @@ def coupon_action():
 
 @app.route('/generate_new')
 def generate_new():
-    global g_coupon_table
-    if(g_coupon_table == None):
-        g_coupon_table = coupon.CouponTable()
+    global g_coupon_table, FORCE_HTTPS
+
+    if 'localhost' in flask.request.host_url:
+        FORCE_HTTPS = False
+
+    if 'credentials' not in flask.session:
+        return flask.redirect('authorize')
+
+    # Load credentials
+    credentials = google.oauth2.credentials.Credentials(**flask.session['credentials'])
+
+    # Refresh credentials if necessary
+    if credentials.expired and credentials.refresh_token:
+        credentials.refresh(Request())
+
+    # Initialize CouponTable with credentials
+    if g_coupon_table is None or not hasattr(g_coupon_table, 'mysheet') or g_coupon_table.mysheet.sheet is None:
+        g_coupon_table = coupon.CouponTable(credentials=credentials)
+
+    # Save credentials back to session
+    flask.session['credentials'] = credentials_to_dict(credentials)
+
     result = g_coupon_table.generate_new_coupon()
     return render_template('generate_new.html', **locals())
 

@@ -4,6 +4,8 @@ CP_DATE_OF_USE = 1
 CP_OWNER = 2
 CP_EXPIRY_DATE = 3
 CP_NOTES = 4
+# TODO: Consider making SPREADSHEET_ID, PAGE_NAME, and RANGE_NAME configurable
+# via environment variables or a dedicated configuration file.
 SPREADSHEET_ID = '1hPciz779MX8IEUdYxtTDNkwTNN0YFod-3JZbJWJirlU'
 PAGE_NAME = '2023'
 RANGE_NAME = 'A:E'
@@ -38,7 +40,7 @@ class Coupon():
     def set_date_of_use(self, date_of_use):
         if type(date_of_use) is date:
             self.row_data[CP_DATE_OF_USE] = date_of_use.strftime("%Y-%m-%d")
-        elif type(date_of_use) is str and date_of_use != '':
+        elif type(date_of_use) is str: # Allow empty string to be set
             self.row_data[CP_DATE_OF_USE]= date_of_use
 
     def use_this_coupon(self):
@@ -58,7 +60,7 @@ class Coupon():
     def set_expiry_date(self, expiry_date):
         if type(expiry_date) is date:
             self.row_data[CP_EXPIRY_DATE] = expiry_date.strftime("%Y-%m-%d")
-        elif type(expiry_date) is str and expiry_date != '':
+        elif type(expiry_date) is str: # Allow empty string to be set
             self.row_data[CP_EXPIRY_DATE] = expiry_date
 
     def get_notes(self):
@@ -82,9 +84,11 @@ class CouponTable():
         return None
 
     def update_coupon(self, coupon:Coupon):
-        row = self.rows[coupon.row_idx]
-        value_range_body = {"values": [[row[CP_COUPON_CODE], row[CP_DATE_OF_USE], row[CP_OWNER], row[CP_EXPIRY_DATE], row[CP_NOTES]]]}
-        self.mysheet.update_data(PAGE_NAME + '!' + 'R['+str(coupon.row_idx)+']', value_range_body)
+        value_range_body = {"values": [[coupon.row_data[CP_COUPON_CODE], coupon.row_data[CP_DATE_OF_USE], coupon.row_data[CP_OWNER], coupon.row_data[CP_EXPIRY_DATE], coupon.row_data[CP_NOTES]]]}
+        # coupon.row_idx is the 1-based index from the self.rows list (where self.rows[0] is likely header)
+        # So, actual sheet row number is coupon.row_idx + 1
+        update_range_a1 = f'{PAGE_NAME}!A{coupon.row_idx + 1}:E{coupon.row_idx + 1}'
+        self.mysheet.update_data(update_range_a1, value_range_body)
 
     def generate_new_coupon(self):
         last_code = self.rows[-1][0] #last coupon code in rows
@@ -92,8 +96,8 @@ class CouponTable():
         new_sn = int(last_number)+1
         new_code = str(new_sn).zfill(4) + random_char(3)
         expiry_date = date.today() + timedelta(days=365)
-        expiry_date.strftime("%Y-%m-%d")
-        self.rows.append([new_code, '', '', expiry_date.strftime("%Y-%m-%d"), '可抵用主商品100元租金'])
+        expiry_date_str = expiry_date.strftime("%Y-%m-%d")
+        self.rows.append([new_code, '', '', expiry_date_str, '可抵用主商品100元租金'])
         new_row = self.rows[-1]
         new_coupon = Coupon(len(self.rows)-1, new_row)
         value_range_body = {"values": [[new_row[CP_COUPON_CODE], new_row[CP_DATE_OF_USE], new_row[CP_OWNER], new_row[CP_EXPIRY_DATE], new_row[CP_NOTES]]]}

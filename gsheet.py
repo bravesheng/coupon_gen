@@ -13,18 +13,18 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of coupon spreadsheet.
 TOKEN_NAME = 'token.json'
-CLIENT_SECRETS_FILE = "client_secret.json"
+# CLIENT_SECRETS_FILE = "client_secret.json" # Removed: Not used by GoogleSheetTools directly
 
 class GoogleSheetTools():
     def __init__(self, spreadsheetId, range, creds):
         try:
             service = build('sheets', 'v4', credentials=creds)
+            self.sheet = service.spreadsheets() # Initialize self.sheet only on success
+            self.__spreadsheetId = spreadsheetId
+            self.__range = range
         except HttpError as err:
-            print(err)
-            
-        self.sheet = service.spreadsheets()
-        self.__spreadsheetId = spreadsheetId
-        self.__range = range
+            print(f"Failed to initialize Google Sheets service: {err}") # Optional: log the error
+            raise # Re-raise the caught HttpError
 
     def get_data(self):
         result = self.sheet.values().get(spreadsheetId=self.__spreadsheetId, range=self.__range).execute()
@@ -37,3 +37,6 @@ class GoogleSheetTools():
     def append(self, value_range_body):
         request = self.sheet.values().append(spreadsheetId=self.__spreadsheetId, range=self.__range, valueInputOption='USER_ENTERED', body=value_range_body)
         response = request.execute()
+
+if __name__ == '__main__':
+    print("This module provides Google Sheet tools and is not intended to be run directly.")
