@@ -40,13 +40,11 @@ def hello():
     credentials.refresh(Request())
     #sonething we can do when ceredentials successed.
     global g_coupon_table
-    if(g_coupon_table == None):
-        g_coupon_table = coupon.CouponTable(credentials)
+    g_coupon_table = coupon.CouponTable(credentials)
 
     # Save credentials back to session in case access token was refreshed.
     flask.session['credentials'] = credentials_to_dict(credentials)
-
-    leave_msg = flask.session
+    
     return render_template('hello.html', **locals())
 
 
