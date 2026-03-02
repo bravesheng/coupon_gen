@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,13 +9,18 @@
   <link rel="icon" href="{{ url_for('static', filename='img/alpaca_logo.ico') }}">
 
   <!-- CSS only -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 
   <!-- 引入我們自己的 CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 
   <!-- 直接定義 CSS -->
-  <style> body {font-family: 'Noto Sans TC', sans-serif;}</style>
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+  </style>
 
   <!-- 可供更改的部分 -->
   <title>{% block title %}{% endblock %}</title>
@@ -22,60 +28,66 @@
 </head>
 
 <body>
-    <!-- 希望能固定出現在每個網頁的 nav -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">  
-        <a class="navbar-brand" href="{{ url_for('hello') }}">Coupon Manager</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-    
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('hello') }}">Search</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('generate_new') }}">Generate New</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Auth Actions
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdownAuth">
-                <li><a class="dropdown-item" href="{{ url_for('authorize') }}">Test Auth Flow</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('revoke') }}">Revoke and Clear Credentials</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('clear_credentials') }}">Clear Credentials</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/test">Test API Request (Test Route)</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+  <!-- 希望能固定出現在每個網頁的 nav -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('hello') }}">Coupon Manager v260321</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('hello') }}">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('generate_new') }}">Generate New</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAuth" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Auth Actions
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownAuth">
+              <li><a class="dropdown-item" href="{{ url_for('authorize') }}">Test Auth Flow</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('revoke') }}">Revoke and Clear Credentials</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('clear_credentials') }}">Clear Credentials</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/test">Test API Request (Test Route)</a></li>
+            </ul>
+          </li>
+        </ul>
       </div>
-    </nav>
-  
+    </div>
+  </nav>
+
   <main class="container mt-3">
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
     <!-- 可供更改的部分 -->
     {% block main %}{% endblock %}
   </main>
-  
+
   <!-- 希望能固定出現在每個網頁的 footer -->
   <footer>
-  <p style="text-align: center;"> © 2022 數位小搖滾有限公司</p>
+    <p style="text-align: center;"> © 2022 數位小搖滾有限公司</p>
   </footer>
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-    <!-- 可供更改的部分 -->
-    {% block script %}{% endblock %}
-  </body>
+  <!-- JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+    crossorigin="anonymous"></script>
+  <!-- 可供更改的部分 -->
+  {% block script %}{% endblock %}
+</body>

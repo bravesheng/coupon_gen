@@ -72,6 +72,9 @@ def authorize():
 
     # Store the state so the callback can verify the auth server response.
     flask.session['state'] = state
+    
+    if getattr(flow, 'code_verifier', None):
+        flask.session['code_verifier'] = flow.code_verifier
 
     return flask.redirect(authorization_url)
 
@@ -83,6 +86,10 @@ def oauth2callback():
     state = flask.session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+
+    if 'code_verifier' in flask.session:
+        flow.code_verifier = flask.session['code_verifier']
+
     if FORCE_HTTPS:
         flow.redirect_uri = flask.url_for('oauth2callback', _external=True, _scheme='https')
     else:
@@ -205,4 +212,4 @@ if __name__ == '__main__':
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # desable HTTPS check only for test.
     os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
     #app.run(debug=True, port=8080)
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
