@@ -28,25 +28,31 @@
   <label for="floatingSelect">給予折扣</label>
 </div>
 <div class="mt-3"></div>
-<div class="form-floating mb-3 position-relative">
-  <textarea class="form-control" placeholder="Leave a comment here" id="discountTextarea"
-    style="height: 140px; padding-right: 70px;">
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-floating mb-3 position-relative">
+      <textarea class="form-control" placeholder="Leave a comment here" id="discountTextarea"
+        style="height: 140px; padding-right: 70px;">
 提供您老客戶折扣碼可分享給計畫租借的朋友或下次使用
 折價券兌換碼：{{result.get_coupon_code()}}
 使用期限{{result.get_expiry_date()}}，一筆訂單可使用一組，滿額最高可抵用100元租金
 詳細辦法請參考 https://zuzoo.page.link/coupon</textarea>
-  <label for="discountTextarea">折扣碼訊息</label>
-  <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-3 me-3" type="button"
-    style="z-index: 5;" onclick="copyToClipboard('discountTextarea', this)">Copy</button>
-</div>
+      <label for="discountTextarea">折扣碼訊息</label>
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-3 me-3" type="button"
+        style="z-index: 5;" onclick="copyToClipboard('discountTextarea', this)">Copy</button>
+    </div>
+  </div>
 
-<div class="form-floating mb-3 position-relative">
-  <textarea class="form-control" placeholder="Leave a comment here" id="reviewTextarea"
-    style="height: 100px; padding-right: 70px;">
+  <div class="col-md-6">
+    <div class="form-floating mb-3 position-relative">
+      <textarea class="form-control" placeholder="Leave a comment here" id="reviewTextarea"
+        style="height: 140px; padding-right: 70px;">
 如覺得服務不錯，歡迎在Google給好評價，謝謝您：https://g.page/zuzoo/review?gm</textarea>
-  <label for="reviewTextarea">評價提醒</label>
-  <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-3 me-3" type="button"
-    style="z-index: 5;" onclick="copyToClipboard('reviewTextarea', this)">Copy</button>
+      <label for="reviewTextarea">評價提醒</label>
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 mt-3 me-3" type="button"
+        style="z-index: 5;" onclick="copyToClipboard('reviewTextarea', this)">Copy</button>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
