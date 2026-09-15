@@ -81,8 +81,13 @@
   </main>
 
   <!-- 希望能固定出現在每個網頁的 footer -->
-  <footer>
+  <footer class="mt-4">
     <p style="text-align: center;"> © 2022 數位小搖滾有限公司</p>
+    <p style="text-align: center;">
+      <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+      &middot;
+      <a href="{{ url_for('terms_of_service') }}">Terms of Service</a>
+    </p>
   </footer>
   <!-- JavaScript Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"

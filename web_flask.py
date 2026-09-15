@@ -154,6 +154,18 @@ def credentials_to_dict(credentials):
 # print_index_table() function removed as its functionality is now in base.html
 
 
+# 這兩頁供 Google OAuth 同意畫面的隱私權政策／服務條款連結使用，
+# 必須在未登入的情況下也能開啟，因此不檢查 credentials。
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
+@app.route('/terms')
+def terms_of_service():
+    return render_template('terms_of_service.html')
+
+
 @app.route('/find_coupon', methods=['POST'])
 def find_coupon():
     find_text = request.values['find_text']
