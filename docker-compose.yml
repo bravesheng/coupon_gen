@@ -1,0 +1,44 @@
+# Synology Container Manager → 專案(Project) 用
+#
+# 部署前請先：
+#   1. 在專案資料夾下建立 secrets/ 並放入 client_secret.json
+#   2. 將下方 FLASK_SECRET_KEY 換成隨機值（python3 -c "import secrets;print(secrets.token_hex(32))"）
+services:
+  coupon-gen:
+    build: .
+    image: coupon-gen:latest
+    container_name: coupon-gen
+    restart: unless-stopped
+
+    ports:
+      # 左邊是 NAS 對外埠，右邊是容器內固定的 8080，不要改右邊。
+      # 不要改成 1010：1010 由反向代理的 nginx 佔用，容器再綁會 bind 失敗。
+      - "8080:8080"
+
+    environment:
+      # 必改：未設定時每次重啟 session 都會失效
+      FLASK_SECRET_KEY: "REPLACE_WITH_RANDOM_HEX"
+      CLIENT_SECRETS_FILE: /app/secrets/client_secret.json
+      TZ: Asia/Taipei
+      # 反向代理已終結 TLS，容器內收到的是 http，需放寬 oauthlib 檢查
+      OAUTHLIB_INSECURE_TRANSPORT: "1"
+      OAUTHLIB_RELAX_TOKEN_SCOPE: "1"
+
+    volumes:
+      # 唯讀掛載 OAuth 用戶端憑證；更新憑證只需換檔後重啟，不必重建映像檔。
+      # 憑證只存放在 secrets/ 這一份，根目錄不要再放複本，以免版本不同步。
+      - ./secrets/client_secret.json:/app/secrets/client_secret.json:ro
+
+    healthcheck:
+      # 只驗證埠有在監聽；打 / 會被導向 /authorize 進而連外到 Google
+      test: ["CMD", "python", "-c", "import socket;socket.create_connection(('127.0.0.1',8080),timeout=5).close()"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

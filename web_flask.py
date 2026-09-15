@@ -4,6 +4,8 @@ from flask import Flask, render_template, request
 from google.auth.transport.requests import Request
 
 import os
+import secrets
+
 import flask
 import requests
 
@@ -12,17 +14,18 @@ import google_auth_oauthlib.flow
 
 import coupon
 
-CLIENT_SECRETS_FILE = "client_secret.json"
+CLIENT_SECRETS_FILE = os.environ.get('CLIENT_SECRETS_FILE', 'secrets/client_secret.json')
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
 FORCE_HTTPS = True
 
 app = Flask(__name__)
-# Note: A secret key is included in the sample so that it works.
-# If you use this code in your application, replace this with a truly secret
-# key. See https://flask.palletsprojects.com/quickstart/#sessions.
-app.secret_key = 'b802a26fcce058997a8f1e74e61c7a5c24d4bf4d29d92c06cbbe26cf2d760192'
+# Session 金鑰由環境變數 FLASK_SECRET_KEY 提供。未設定時每次啟動隨機產生，
+# 容器重啟後既有 session 會失效（使用者需重新授權），但不會沿用硬編碼金鑰。
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or secrets.token_hex(32)
+if not os.environ.get('FLASK_SECRET_KEY'):
+    app.logger.warning('FLASK_SECRET_KEY not set; using an ephemeral key (sessions reset on restart).')
 g_coupon_table = None
 
 @app.route("/")

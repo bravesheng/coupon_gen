@@ -56,7 +56,8 @@ This project is a Flask-based web application designed to manage coupons. It use
         *   Choose "Web application" as the application type.
         *   Add **Authorized JavaScript origins**: Your application's host (e.g., `http://localhost:8080`, `http://127.0.0.1:8080`).
         *   Add **Authorized redirect URIs**: The callback URL for the OAuth flow. This should be `http://localhost:8080/oauth2callback` or `http://127.0.0.1:8080/oauth2callback` for local development. If deploying, adjust accordingly and ensure it's HTTPS.
-        *   Download the JSON file. Rename it to `client_secret.json` and place it in the root directory of the project.
+        *   Download the JSON file. Rename it to `client_secret.json` and place it at `secrets/client_secret.json`
+            (本機直接執行與容器部署都讀這個位置；可用環境變數 `CLIENT_SECRETS_FILE` 覆寫)。
 
 5.  **Configure Google Sheet:**
     *   Create a new Google Sheet or use an existing one.
@@ -72,6 +73,143 @@ This project is a Flask-based web application designed to manage coupons. It use
     python web_flask.py
     ```
     The application will typically be available at `http://localhost:8080` or `http://0.0.0.0:8080`.
+
+## Deploy to Synology NAS (Container Manager)
+
+本專案已容器化，可在 DSM 7.2+ 的 Container Manager 以「專案(Project)」方式直接在 NAS 上建置執行。
+
+### 相關檔案
+*   `Dockerfile`: 以 `python:3.11-slim` 為基底，非 root 執行，不將憑證烘進映像檔。
+*   `.dockerignore`: 排除 `.env` 虛擬環境（87MB）、`.git` 與所有機密檔案。
+*   `docker-compose.yml`: Container Manager 專案定義，含連接埠、環境變數與 volume 掛載。
+
+### 部署步驟
+
+1.  **上傳原始碼到 NAS**
+    透過 File Station 或 rsync，將專案資料夾（不含 `.env`、`.git`）複製到共用資料夾，
+    例如 `/volume1/docker/coupon-gen/`。
+
+2.  **放入 OAuth 憑證**
+    在專案資料夾下建立 `secrets/` 子目錄，放入 `client_secret.json`：
+    ```
+    /volume1/docker/coupon-gen/
+    ├── Dockerfile
+    ├── docker-compose.yml
+    ├── web_flask.py, coupon.py, gsheet.py, requirements.txt
+    ├── templates/
+    └── secrets/
+        └── client_secret.json      <- OAuth 用戶端憑證，只存放這一份
+    ```
+    **憑證只放在 `secrets/` 這一個位置，根目錄不要再留複本。**
+    兩份檔案很容易版本不同步，導致容器仍掛著舊的用戶端，
+    在授權時出現 `401 deleted_client`。
+
+    **注意：** 若 `secrets/client_secret.json` 不存在，Docker 會在該路徑自動建立一個「目錄」，
+    導致授權時讀取憑證失敗。務必先確認檔案已就位。
+    檔案權限需讓容器內 uid 1000 可讀（`chmod 644`）。
+
+3.  **設定 session 金鑰**
+    編輯 `docker-compose.yml`，將 `FLASK_SECRET_KEY` 的 `REPLACE_WITH_RANDOM_HEX` 換成隨機值：
+    ```bash
+    python3 -c "import secrets; print(secrets.token_hex(32))"
+    ```
+
+4.  **建立專案**
+    Container Manager → 專案 → 新增 → 路徑選擇上述資料夾 →
+    來源選「使用現有的 docker-compose.yml」→ 建置並啟動。
+
+5.  **設定反向代理**
+    控制台 → 登入入口 → 進階 → 反向代理伺服器，新增規則：
+
+    | 項目 | 值 |
+    | --- | --- |
+    | 來源通訊協定 | HTTPS |
+    | 來源主機名稱 | `sociorock.com` |
+    | 來源連接埠 | `1010` |
+    | 目的地通訊協定 | HTTP |
+    | 目的地主機名稱 | `localhost` |
+    | 目的地連接埠 | `8080` |
+
+    此設定需與 Google Cloud Console 中登錄的 redirect URI
+    `https://sociorock.com:1010/oauth2callback` 完全一致。
+
+### 環境變數
+
+| 變數 | 預設 | 說明 |
+| --- | --- | --- |
+| `FLASK_SECRET_KEY` | 隨機產生 | Flask session 簽章金鑰。未設定時每次重啟都會失效，使用者須重新授權。 |
+| `CLIENT_SECRETS_FILE` | `secrets/client_secret.json` | OAuth 用戶端憑證路徑；容器內為 `/app/secrets/client_secret.json`。 |
+| `OAUTHLIB_INSECURE_TRANSPORT` | — | 反向代理已終結 TLS、容器內收到 HTTP 時需設為 `1`。 |
+| `OAUTHLIB_RELAX_TOKEN_SCOPE` | — | 放寬 scope 比對，設為 `1`。 |
+| `TZ` | `Asia/Taipei` | 影響優惠券使用日期與到期日的計算。 |
+
+### 疑難排解
+
+**`driver failed programming external connectivity on endpoint coupon-gen`**
+
+Docker 無法綁定對外埠，絕大多數是該埠已被佔用。錯誤訊息結尾通常會指明
+`Bind for 0.0.0.0:<port> failed: port is already allocated`。
+
+1.  在 NAS 上以 SSH 確認佔用者：
+    ```bash
+    sudo netstat -tulpn | grep ':8080'
+    sudo docker ps --format 'table {{.Names}}\t{{.Ports}}'
+    ```
+2.  改用其他未使用的埠：修改 `docker-compose.yml` 中 `ports` 的**左側**數字
+    （右側 `8080` 是容器內部埠，不要更動），並同步更新反向代理的目的地連接埠。
+3.  若該埠確實沒人使用卻仍失敗，通常是 Docker 的 iptables 規則殘留，
+    重啟 Container Manager 套件即可（套件中心 → Container Manager → 停止 → 啟動）。
+
+**授權時出現 `401: deleted_client`**
+
+請求帶的 OAuth 用戶端已在 Google Cloud 上被刪除，通常是建立了新的用戶端但容器仍掛著舊檔。
+比對線上服務實際使用的 client_id 與本機檔案：
+
+```bash
+# 線上服務目前使用的 client_id
+curl -sik -H "Host: sociorock.com" https://<NAS-IP>:1010/authorize \
+  | grep -i '^location' | grep -o 'client_id=[^&]*'
+
+# 憑證檔裡的 client_id
+python3 -c "import json;print(json.load(open('secrets/client_secret.json'))['web']['client_id'])"
+```
+
+兩者不一致就是 `secrets/client_secret.json` 沒更新到 NAS，或更新後容器未重啟。
+
+**更換 OAuth 用戶端後的檢查清單：** 新用戶端若建在**不同的 Google Cloud 專案**，
+下列設定不會自動沿用，必須在新專案重做：
+
+1.  啟用 **Google Sheets API**
+2.  設定 OAuth 同意畫面（發布狀態、測試使用者）
+3.  確認重新導向 URI 含 `https://sociorock.com:1010/oauth2callback`
+
+**反向代理回應 502**
+
+nginx 連不到後端。依序確認：
+
+1.  **目的地通訊協定必須是 HTTP，不是 HTTPS。**
+    容器內跑的是 Flask 開發伺服器，只接受純 HTTP。若目的地選 HTTPS，
+    nginx 會對它發起 TLS 交握而失敗，結果就是 502。TLS 在 nginx 這層終結即可。
+2.  目的地連接埠要與 `docker-compose.yml` 中 `ports` 左側的數字一致（預設 8080）。
+3.  從 NAS 本機直接打後端，確認容器本身正常：
+    ```bash
+    curl -I http://localhost:8080/     # 應回 302 FOUND
+    ```
+    若這一步就失敗，問題在容器而非代理，改看 `sudo docker logs coupon-gen`。
+
+**常見誤解：不要把對外埠設成 1010。**
+1010 是反向代理（nginx）監聽的埠，容器若也想綁 1010 會直接 bind 失敗。
+正確的鏈路是：
+
+    瀏覽器 --HTTPS--> nginx:1010 --HTTP--> 容器:8080
+
+**注意：** 對外埠換了不影響 OAuth。Google 比對的是反向代理的來源位址
+`https://sociorock.com:1010/oauth2callback`，與容器對外埠無關。
+
+### 更新
+
+*   **只換 OAuth 憑證：** 替換 `secrets/client_secret.json` 後重啟容器即可，不必重建映像檔。
+*   **改了程式碼：** Container Manager → 專案 → 建置，重新建置後重啟。
 
 ## Usage
 Once the application is running:
