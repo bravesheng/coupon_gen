@@ -33,4 +33,12 @@ describe('Cloudflare Access middleware', () => {
     const res2 = await app.request('/', {}, { DB, DEV_BYPASS_ACCESS: 'true' })
     expect(res2.status).toBe(503)
   })
+  it('still rejects a malformed token when ACCESS_ISSUER overrides the issuer', async () => {
+    const res = await app.request(
+      '/',
+      { headers: { 'Cf-Access-Jwt-Assertion': 'not.a.jwt' } },
+      { DB, ACCESS_TEAM_DOMAIN: 'team.cloudflareaccess.com', ACCESS_AUD: 'aud', ACCESS_ISSUER: 'https://old-name.cloudflareaccess.com' },
+    )
+    expect(res.status).toBe(403)
+  })
 })

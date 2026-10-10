@@ -25,7 +25,9 @@
     // Zero Trust 團隊網域，例如 "mycompany.cloudflareaccess.com"
     "ACCESS_TEAM_DOMAIN": "zuzoo-coupon-gen.cloudflareaccess.com",
     // Access 應用程式的 Application Audience (AUD) Tag
-    "ACCESS_AUD": "9ed11ed593bc113bc976a21954fee4998d3aaaaec6a4386918222cfb97e01f54"
+    "ACCESS_AUD": "9ed11ed593bc113bc976a21954fee4998d3aaaaec6a4386918222cfb97e01f54",
+    // 憑證的 iss。這個團隊最初叫 ancient-shadow-1fa4，改名成 zuzoo-coupon-gen 後 iss 沒有跟著變
+    "ACCESS_ISSUER": "https://ancient-shadow-1fa4.cloudflareaccess.com"
   }
 
   // 綁定自訂網域後取消註解（網域需先託管在 Cloudflare）
