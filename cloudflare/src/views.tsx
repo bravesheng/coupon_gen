@@ -22,7 +22,6 @@ export function Layout({ title, user, msg, children }: PropsWithChildren<Base & 
           <header class="top">
             <a class="brand" href="/">Coupon Manager</a>
             <nav>
-              <a href="/">查詢</a>
               <a href="/list">列表</a>
               <a href="/new" class="button">新增優惠券</a>
             </nav>
