@@ -96,6 +96,7 @@ npm test && npm run typecheck
    日誌會印出失敗原因與憑證的 `iss`、`aud`。最常見的是 `unexpected "iss" claim value`：
    Zero Trust 團隊網域改過名字時，憑證的 `iss` 仍是最初自動產生的名稱（例如 `https://ancient-shadow-1fa4.cloudflareaccess.com`），
    把日誌裡的 `iss` 值填進 `wrangler.jsonc` 的 `ACCESS_ISSUER` 後重新部署即可。
+   之後再改團隊網域名稱時，只需更新 `ACCESS_TEAM_DOMAIN`（金鑰端點會跟著搬家），`ACCESS_ISSUER` 維持原始名稱不動。
 
 8. **關掉 workers.dev 入口（建議）**
    Workers & Pages → coupon → Settings → Domains & Routes → 停用 `workers.dev`。
@@ -123,5 +124,5 @@ npx wrangler d1 export coupon --remote --output=backup-$(date +%F).sql
 | --- | --- | --- |
 | `ACCESS_TEAM_DOMAIN` | `wrangler.jsonc` vars | Zero Trust 團隊網域 |
 | `ACCESS_AUD` | `wrangler.jsonc` vars | Access 應用程式的 AUD Tag |
-| `ACCESS_ISSUER` | `wrangler.jsonc` vars | 憑證的 `iss`，預設 `https://<ACCESS_TEAM_DOMAIN>`；團隊網域改過名時才需要設定 |
+| `ACCESS_ISSUER` | `wrangler.jsonc` vars | 額外接受的憑證 `iss`；程式永遠接受 `https://<ACCESS_TEAM_DOMAIN>`，團隊網域改過名時把原始名稱填在這裡 |
 | `DEV_BYPASS_ACCESS` | 只放 `.dev.vars` | 設為 `1` 時略過驗證，**絕不要**放進 `wrangler.jsonc` |

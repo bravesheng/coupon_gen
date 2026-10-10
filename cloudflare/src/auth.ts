@@ -37,10 +37,10 @@ export const accessAuth = createMiddleware<AppEnv>(async (c, next) => {
   if (!token) return c.text('未授權：缺少 Cloudflare Access 憑證。', 403)
 
   try {
-    // 金鑰一律從設定的團隊網域抓；iss 預設也是它，但 Zero Trust 團隊網域改過名時
-    // 憑證的 iss 仍是最初自動產生的名稱，這時用 ACCESS_ISSUER 指定。
+    // 金鑰一律從設定的團隊網域抓。iss 接受目前的團隊網域，以及 ACCESS_ISSUER 指定的原始名稱：
+    // Zero Trust 團隊網域改過名時，憑證的 iss 仍是最初自動產生的那個。
     const jwksOrigin = `https://${team}`
-    const issuer = c.env.ACCESS_ISSUER?.trim() || jwksOrigin
+    const issuer = [...new Set([jwksOrigin, c.env.ACCESS_ISSUER?.trim() || ''].filter(Boolean))]
     const { payload } = await jwtVerify(token, jwksFor(jwksOrigin), { issuer, audience: aud })
     c.set('user', typeof payload.email === 'string' ? payload.email : String(payload.sub ?? ''))
   } catch (err) {
