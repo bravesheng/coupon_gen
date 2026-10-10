@@ -40,11 +40,19 @@ app.get('/', async (c) => {
 })
 
 app.post('/find', async (c) => {
-  const code = normalizeCode(field(await c.req.parseBody(), 'code'))
-  if (!code) return c.redirect(redirectWithMsg('/', '請輸入代碼'))
-  const found = await db.findByCode(c.env.DB, code)
-  if (!found) return c.redirect(redirectWithMsg('/', `找不到代碼 ${code}，請確認後再查一次。`))
-  return c.redirect(`/c/${encodeURIComponent(found.code)}`)
+  const raw = field(await c.req.parseBody(), 'q').slice(0, 50)
+  if (!raw) return c.redirect(redirectWithMsg('/', '請輸入優惠券代碼或持有人'))
+
+  // 1. 代碼完全相符：直接開那張券
+  const code = normalizeCode(raw)
+  const exact = await db.findByCode(c.env.DB, code)
+  if (exact) return c.redirect(`/c/${encodeURIComponent(exact.code)}`)
+
+  // 2. 否則以持有人（以及代碼、備註）模糊搜尋
+  const matches = await db.list(c.env.DB, { status: 'all', q: raw, today: todayTaipei(), limit: 2 })
+  if (matches.length === 0) return c.redirect(redirectWithMsg('/', `找不到代碼或持有人「${raw}」，請確認後再查一次。`))
+  if (matches.length === 1) return c.redirect(redirectWithMsg(`/c/${encodeURIComponent(matches[0].code)}`, `以「${raw}」找到這張優惠券`))
+  return c.redirect(`/list?status=all&q=${encodeURIComponent(raw)}`)
 })
 
 app.get('/c/:code', async (c) => {

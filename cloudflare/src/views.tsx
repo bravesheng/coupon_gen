@@ -84,11 +84,10 @@ export function HomePage({ user, msg, recent, today }: Base & { recent: Coupon[]
       <section class="card">
         <form method="post" action="/find" class="search">
           <input
-            name="code"
-            placeholder="輸入優惠券代碼，例如 0123ABC"
+            name="q"
+            placeholder="輸入優惠券代碼或持有人"
             autofocus
             autocomplete="off"
-            autocapitalize="characters"
             spellcheck={false}
             required
           />
@@ -96,6 +95,7 @@ export function HomePage({ user, msg, recent, today }: Base & { recent: Coupon[]
             查詢
           </button>
         </form>
+        <p class="hint">代碼完全相符會直接開啟；輸入持有人可模糊搜尋，多筆結果會列表顯示。</p>
       </section>
       <section class="card">
         <h2>最近異動</h2>
