@@ -1,0 +1,25 @@
+{
+  "name": "coupon-cf",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:create": "wrangler d1 create coupon",
+    "db:migrate:local": "wrangler d1 migrations apply coupon --local",
+    "db:migrate": "wrangler d1 migrations apply coupon --remote",
+    "csv-to-sql": "node scripts/csv-to-sql.mjs"
+  },
+  "dependencies": {
+    "hono": "^4.13.13",
+    "jose": "^6.2.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261010.1",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.3",
+    "wrangler": "^4.149.0"
+  }
+}

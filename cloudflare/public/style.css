@@ -1,0 +1,52 @@
+:root {
+  --bg: #f5f6f8; --card: #fff; --text: #1f2328; --muted: #6b7280; --line: #e5e7eb;
+  --primary: #2563eb; --danger: #dc2626; --ok: #16a34a; --warn: #d97706;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, "PingFang TC", "Noto Sans TC", system-ui, sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 16px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 16px; background: var(--card); border-bottom: 1px solid var(--line); }
+.top .brand { font-weight: 700; text-decoration: none; color: var(--text); margin-right: auto; }
+.top nav { display: flex; gap: 14px; align-items: center; }
+.top nav a { color: var(--primary); text-decoration: none; }
+.top nav a.button { color: #fff; padding: 8px 14px; }
+.top .user { font-size: 12px; color: var(--muted); width: 100%; }
+@media (min-width: 640px) { .top .user { width: auto; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+h1 { font-size: 22px; margin: 0 0 12px; } h2 { font-size: 16px; margin: 0 0 10px; color: var(--muted); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em; }
+.flash { background: #eef4ff; border: 1px solid #c7d7fe; color: #1e3a8a; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; }
+input, select, textarea, button { font: inherit; }
+input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+textarea { resize: vertical; }
+button, a.button { white-space: nowrap; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; text-decoration: none; color: var(--text); }
+button.primary, a.button { background: var(--primary); border-color: var(--primary); color: #fff; }
+button.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.search, .filter { display: flex; gap: 8px; } .search input { font-size: 18px; }
+.filter select { width: auto; }
+.grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; } }
+.grid label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--muted); }
+.grid .full { grid-column: 1 / -1; }
+.actions { display: flex; gap: 8px; }
+.redeem-row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+form.redeem { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button.warn { background: var(--warn); border-color: var(--warn); color: #fff; }
+form.redeem.armed button.danger { background: #991b1b; border-color: #991b1b; animation: pulse 1s ease-in-out infinite; }
+form.redeem.armed button.warn { background: #92400e; border-color: #92400e; animation: pulse 1s ease-in-out infinite; }
+.actions { align-items: center; }
+@keyframes pulse { 50% { opacity: .75; } }
+.discount { display: flex; gap: 8px; } .discount select { flex: 1; } .discount input { flex: 1; }
+.meta, .hint { color: var(--muted); font-size: 13px; }
+.empty { color: var(--muted); text-align: center; padding: 16px; }
+.badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; color: #fff; vertical-align: middle; }
+.badge.unused { background: var(--ok); } .badge.used { background: var(--muted); } .badge.expired { background: var(--warn); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+.card:has(table) { overflow-x: auto; }
+.msg { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; margin-bottom: 12px; }
+.msg label { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+.req { color: var(--danger); }
+.errors { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 8px; padding: 10px 12px 10px 28px; margin: 0 0 12px; }

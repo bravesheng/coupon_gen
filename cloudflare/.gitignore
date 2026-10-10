@@ -1,0 +1,10 @@
+node_modules/
+.wrangler/
+.dev.vars
+import.sql
+*.csv
+
+# 根目錄 .gitignore 以 *.json 擋憑證檔，這裡把專案設定檔加回來
+!package.json
+!package-lock.json
+!tsconfig.json

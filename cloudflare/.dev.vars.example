@@ -1,0 +1,2 @@
+# 複製成 .dev.vars 供 `npm run dev` 使用。本機開發略過 Cloudflare Access 驗證。
+DEV_BYPASS_ACCESS=1
