@@ -79,7 +79,11 @@ npm test && npm run typecheck
    * Application domain：`coupon.sociorock.com`
    * Identity providers：啟用 Google（或 One-time PIN）
    * Policy：Allow，Include → Emails → 填入允許登入的員工信箱
-   * 建好後在應用程式的 Overview 複製 **Application Audience (AUD) Tag**
+   * 建好後在應用程式的 Overview 複製 **Application Audience (AUD) Tag**。
+     找不到的話，直接對網域發一次未登入的請求，導向登入頁的網址裡 `kid=` 後面那串就是 AUD：
+     ```bash
+     curl -s -o /dev/null -w '%{redirect_url}\n' https://coupon.sociorock.com/ | grep -o 'kid=[0-9a-f]*'
+     ```
 
 7. **把 Access 參數填進 Worker**
    在 `wrangler.jsonc` 的 `vars` 填入：

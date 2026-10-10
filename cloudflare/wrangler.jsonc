@@ -4,6 +4,9 @@
   "main": "src/index.tsx",
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
+  // 只透過自訂網域提供服務，不開 *.workers.dev 入口
+  "workers_dev": false,
+  "preview_urls": false,
 
   // public/ 內的 CSS、JS 由 Cloudflare 直接提供，不經過 Worker
   "assets": { "directory": "./public" },
@@ -13,18 +16,18 @@
       "binding": "DB",
       "database_name": "coupon",
       // 執行 `npm run db:create` 後，把輸出的 database_id 貼到這裡
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "7e7faea8-c4e2-4ec3-99d7-5aa9f0e658d4",
       "migrations_dir": "migrations"
     }
   ],
 
   "vars": {
     // Zero Trust 團隊網域，例如 "mycompany.cloudflareaccess.com"
-    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_TEAM_DOMAIN": "zuzoo-coupon-gen.cloudflareaccess.com",
     // Access 應用程式的 Application Audience (AUD) Tag
-    "ACCESS_AUD": ""
+    "ACCESS_AUD": "9ed11ed593bc113bc976a21954fee4998d3aaaaec6a4386918222cfb97e01f54"
   }
 
   // 綁定自訂網域後取消註解（網域需先託管在 Cloudflare）
-  // ,"routes": [{ "pattern": "coupon.sociorock.com", "custom_domain": true }]
+  ,"routes": [{ "pattern": "coupon.sociorock.com", "custom_domain": true }]
 }
