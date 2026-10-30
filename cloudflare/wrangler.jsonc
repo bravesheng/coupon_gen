@@ -31,6 +31,8 @@
     "ACCESS_ISSUER": "https://ancient-shadow-1fa4.cloudflareaccess.com"
   }
 
-  // 綁定自訂網域後取消註解（網域需先託管在 Cloudflare）
-  ,"routes": [{ "pattern": "coupon.sociorock.com", "custom_domain": true }]
+  // 自訂網域（網域需先託管在 Cloudflare）。
+  // `wrangler deploy` 會讓 Worker 的自訂網域與這份清單完全一致：
+  // 只在控制台加、沒寫在這裡的網域，下次部署會被移除（連同 DNS 記錄）。
+  ,"routes": [{ "pattern": "coupon.zuzoo.tw", "custom_domain": true }]
 }

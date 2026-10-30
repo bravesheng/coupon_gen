@@ -39,7 +39,7 @@ npm test && npm run typecheck
 
 ## 首次部署
 
-前置：一個 Cloudflare 帳號，`sociorock.com` 的 DNS 託管在 Cloudflare（自訂網域與 Access 都需要）。
+前置：一個 Cloudflare 帳號，`zuzoo.tw` 的 DNS 託管在 Cloudflare（自訂網域與 Access 都需要）。
 
 1. **登入 wrangler**
    ```bash
@@ -71,18 +71,23 @@ npm test && npm run typecheck
    此時 `ACCESS_TEAM_DOMAIN` / `ACCESS_AUD` 是空的，Worker 會對所有請求回 503，這是刻意的（fail closed）。
 
 5. **綁自訂網域**
-   取消 `wrangler.jsonc` 裡 `routes` 的註解（預設 `coupon.sociorock.com`，可改），再 `npm run deploy` 一次。
+   `wrangler.jsonc` 的 `routes` 寫要用的網域（目前是 `coupon.zuzoo.tw`），再 `npm run deploy` 一次。
    Cloudflare 會自動建立 DNS 記錄與憑證。
+
+   **自訂網域一律寫在 `wrangler.jsonc` 的 `routes`，不要只在控制台加。**
+   `wrangler deploy` 會讓 Worker 的自訂網域與 `routes` 完全一致，只在控制台加的網域下次部署就會被移除，
+   連同 DNS 記錄一起刪掉（瀏覽器會出現 `DNS_PROBE_FINISHED_NXDOMAIN`）。
+   新網域也要加進同一個 Access 應用程式，AUD 才會跟 `ACCESS_AUD` 一致。
 
 6. **設定 Cloudflare Access**
    Zero Trust 控制台 → Access → Applications → Add an application → Self-hosted：
-   * Application domain：`coupon.sociorock.com`
+   * Application domain：`coupon.zuzoo.tw`
    * Identity providers：啟用 Google（或 One-time PIN）
    * Policy：Allow，Include → Emails → 填入允許登入的員工信箱
    * 建好後在應用程式的 Overview 複製 **Application Audience (AUD) Tag**。
      找不到的話，直接對網域發一次未登入的請求，導向登入頁的網址裡 `kid=` 後面那串就是 AUD：
      ```bash
-     curl -s -o /dev/null -w '%{redirect_url}\n' https://coupon.sociorock.com/ | grep -o 'kid=[0-9a-f]*'
+     curl -s -o /dev/null -w '%{redirect_url}\n' https://coupon.zuzoo.tw/ | grep -o 'kid=[0-9a-f]*'
      ```
 
 7. **把 Access 參數填進 Worker**
@@ -90,7 +95,7 @@ npm test && npm run typecheck
    * `ACCESS_TEAM_DOMAIN`：Zero Trust → Settings → Custom Pages 顯示的團隊網域，形如 `xxx.cloudflareaccess.com`
    * `ACCESS_AUD`：上一步複製的 AUD Tag
 
-   再 `npm run deploy`。打開 `https://coupon.sociorock.com` 應該先看到 Access 登入頁，登入後進入系統，右上角顯示登入者信箱。
+   再 `npm run deploy`。打開 `https://coupon.zuzoo.tw` 應該先看到 Access 登入頁，登入後進入系統，右上角顯示登入者信箱。
 
    **登入後看到「未授權：Cloudflare Access 憑證無效」**：執行 `npx wrangler tail coupon` 再重新整理頁面，
    日誌會印出失敗原因與憑證的 `iss`、`aud`。最常見的是 `unexpected "iss" claim value`：
