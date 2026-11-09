@@ -9,9 +9,7 @@ describe('messages', () => {
     expect(text).toContain('滿額最高可抵用150元租金')
     expect(text).toContain('詳細辦法請參考 https://zuzoo.tw/discount#coupon_code')
   })
-  it('offers 100 to 300 in steps of 10', () => {
-    expect(DISCOUNT_OPTIONS[0]).toBe(100)
-    expect(DISCOUNT_OPTIONS.at(-1)).toBe(300)
-    expect(DISCOUNT_OPTIONS).toHaveLength(21)
+  it('offers 50, then 100 to 200 in steps of 10', () => {
+    expect(DISCOUNT_OPTIONS).toEqual([50, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200])
   })
 })

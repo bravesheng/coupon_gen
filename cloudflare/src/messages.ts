@@ -1,4 +1,4 @@
-export const DISCOUNT_OPTIONS = Array.from({ length: 21 }, (_, i) => 100 + i * 10)
+export const DISCOUNT_OPTIONS = [50, ...Array.from({ length: 11 }, (_, i) => 100 + i * 10)]
 
 export function discountMessage(c: { code: string; expiry_date: string; discount: number }): string {
   return [
